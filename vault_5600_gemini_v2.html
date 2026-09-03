@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vault 5600 — OPAN 5600 Vocabulary Ledger</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0E241D;
+      --bg-2: #12332A;
+      --tile: #173A2F;
+      --tile-hover: #1D4738;
+      --line: #2E5648;
+      --line-soft: #254A3D;
+      --ink: #F1ECDC;
+      --muted: #93AD9F;
+      --gold: #C9A45A;
+      --gold-bright: #E7CC8B;
+      --good-bg: #1B452B;
+      --good-border: #4EAE6E;
+      --bad-bg: #401B18;
+      --bad-border: #B1473B;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(201, 164, 90, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 20%, rgba(78, 174, 110, 0.05) 0%, transparent 40%);
+      color: var(--ink);
+      font-family: 'Archivo', sans-serif;
+      min-height: 100vh;
+      padding: 24px 16px 60px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 1080px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Tabular numbers */
+    .num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Header Row */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .badge-box {
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 110px;
+    }
+
+    .badge-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .badge-value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--gold-bright);
+    }
+
+    .brand-block {
+      text-align: center;
+      flex: 1;
+      min-width: 260px;
+    }
+
+    .brand-title {
+      font-family: 'Fraunces', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+
+    .brand-title span {
+      color: var(--gold);
+    }
+
+    .brand-tagline {
+      font-size: 0.85rem;
+      font-style: italic;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .hud-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-pill {
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      border-radius: 20px;
+      padding: 8px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-pill:hover {
+      background: var(--tile-hover);
+      border-color: var(--gold);
+      color: var(--gold-bright);
+    }
+
+    .btn-pill:focus-visible {
+      outline: 2px solid var(--gold);
+    }
+
+    hr.divider {
+      border: none;
+      border-bottom: 1px solid var(--line);
+      width: 100%;
+    }
+
+    /* Status Row */
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      color: var(--muted);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .progress-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .progress-bar-bg {
+      width: 140px;
+      height: 8px;
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--gold);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Board Layout */
+    .board-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      position: relative;
+    }
+
+    @media (max-width: 720px) {
+      .board-grid {
+        grid-template-columns: 1fr;
+      }
+      .hud-extra {
+        display: none;
+      }
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .col-header {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 2px;
+      padding-left: 2px;
+    }
+
+    /* Tiles */
+    .tile {
+      background: var(--tile);
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 12px 14px;
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    }
+
+    .tile:hover:not(.matched):not(.selected) {
+      background: var(--tile-hover);
+      border-color: var(--muted);
+    }
+
+    .tile.selected {
+      background: var(--tile-hover);
+      border-color: var(--gold);
+      box-shadow: 0 0 10px rgba(201, 164, 90, 0.25);
+    }
+
+    .tile.good-flash {
+      background: var(--good-bg) !important;
+      border-color: var(--good-border) !important;
+    }
+
+    .tile.bad-flash {
+      background: var(--bad-bg) !important;
+      border-color: var(--bad-border) !important;
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
+    .tile.matched {
+      background: var(--bg-2);
+      border-color: var(--line-soft);
+      cursor: default;
+      opacity: 0.55;
+    }
+
+    .tile-text {
+      font-size: 0.92rem;
+      line-height: 1.35;
+      color: var(--ink);
+      flex: 1;
+      padding-right: 8px;
+    }
+
+    .tile.matched .tile-text {
+      color: var(--muted);
+    }
+
+    /* Hint button on left tiles */
+    .hint-btn {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .hint-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold-bright);
+    }
+
+    .hint-popover {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: var(--bg-2);
+      border: 1px solid var(--gold);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 0.82rem;
+      color: var(--gold-bright);
+      z-index: 10;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+      line-height: 1.3;
+    }
+
+    /* Matched Stamp */
+    .matched-stamp {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%) rotate(-9deg);
+      border: 1.5px solid var(--gold);
+      color: var(--gold);
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      pointer-events: none;
+      background: rgba(14, 36, 29, 0.7);
+    }
+
+    /* Floating +$100 animation */
+    .cash-float {
+      position: absolute;
+      color: var(--gold-bright);
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 700;
+      font-size: 1.2rem;
+      pointer-events: none;
+      z-index: 20;
+      animation: floatUp 0.9s ease-out forwards;
+    }
+
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-35px) scale(1.1); }
+    }
+
+    /* Footer hint */
+    .footer-note {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    /* Fixed Bottom-Right Fun Button */
+    .fun-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .fun-pointer {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.75rem;
+      color: var(--gold-bright);
+      font-style: italic;
+      margin-bottom: 4px;
+      margin-right: 12px;
+    }
+
+    .btn-fun {
+      background: var(--gold);
+      color: #0E241D;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 16px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+      transition: transform 0.2s, background-color 0.2s;
+    }
+
+    .btn-fun:hover {
+      background: var(--gold-bright);
+      transform: translateY(-2px);
+    }
+
+    .fun-toast {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      right: 0;
+      width: 240px;
+      background: var(--bg-2);
+      border: 1px solid var(--gold);
+      color: var(--ink);
+      font-size: 0.78rem;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+      display: none;
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(8, 20, 16, 0.85);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .receipt-card {
+      background: #F1ECDC;
+      color: #12332A;
+      width: 100%;
+      max-width: 400px;
+      border-radius: 6px;
+      padding: 28px 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      font-family: 'Archivo', sans-serif;
+    }
+
+    .receipt-header {
+      text-align: center;
+      border-bottom: 2px dashed #B8B09A;
+      padding-bottom: 12px;
+    }
+
+    .receipt-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #0E241D;
+    }
+
+    .receipt-sub {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #5C6E66;
+      margin-top: 2px;
+    }
+
+    .receipt-body {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.9rem;
+    }
+
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .receipt-label {
+      color: #5C6E66;
+    }
+
+    .receipt-val {
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #0E241D;
+    }
+
+    .receipt-btn {
+      background: #12332A;
+      color: #F1ECDC;
+      border: none;
+      border-radius: 4px;
+      padding: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      margin-top: 8px;
+      transition: background-color 0.2s;
+    }
+
+    .receipt-btn:hover {
+      background: #1D4738;
+    }
+
+    /* Win Fullscreen Overlay */
+    .win-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(14, 36, 29, 0.95);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+      overflow: hidden;
+    }
+
+    .win-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .win-title {
+      font-family: 'Fraunces', serif;
+      font-size: 4rem;
+      font-weight: 700;
+      color: var(--gold-bright);
+      text-shadow: 0 0 20px rgba(201, 164, 90, 0.5);
+      animation: pulseWin 1.5s infinite alternate;
+      z-index: 210;
+    }
+
+    @keyframes pulseWin {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.05); }
+    }
+
+    .money-particle {
+      position: absolute;
+      top: -40px;
+      font-size: 1.8rem;
+      user-select: none;
+      pointer-events: none;
+      z-index: 205;
+      animation: fallDown linear forwards;
+    }
+
+    @keyframes fallDown {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(105vh) rotate(360deg); opacity: 0.8; }
+    }
+
+    /* Accessibility reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .tile.bad-flash { animation: none; }
+      .cash-float { animation: none; opacity: 1; }
+      .win-title { animation: none; }
+      .money-particle { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Header -->
+    <header>
+      <div class="badge-box">
+        <span class="badge-label">TIME</span>
+        <span class="badge-value num" id="timer">00:00</span>
+      </div>
+
+      <div class="brand-block">
+        <h1 class="brand-title">Vault <span>5600</span></h1>
+        <p class="brand-tagline">OPAN 5600: Managerial Statistics — Module 1 Vocabulary Ledger</p>
+      </div>
+
+      <div class="hud-controls">
+        <div class="badge-box">
+          <span class="badge-label">BALANCE</span>
+          <span class="badge-value num" id="balance-display">$0</span>
+        </div>
+
+        <button class="btn-pill" id="btn-randomize" title="Reshuffle current page unmatched tiles">
+          <span>🔀</span> <span class="hud-extra">Randomize</span>
+        </button>
+        <button class="btn-pill" id="btn-reset" title="Reset entire game">
+          <span>🔄</span> <span class="hud-extra">Reset</span>
+        </button>
+      </div>
+    </header>
+
+    <hr class="divider">
+
+    <!-- Status Row -->
+    <div class="status-row">
+      <div class="progress-group">
+        <span id="ledger-page-text">Ledger Page 1 of 6 — 0/8 matched</span>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="page-progress-fill"></div>
+        </div>
+      </div>
+      <div id="terms-learned-text">
+        Terms learned: <span class="num" id="terms-learned-num">0</span>/48
+      </div>
+    </div>
+
+    <!-- Two Column Board -->
+    <main class="board-grid" id="board-grid">
+      <div class="column" id="terms-column">
+        <div class="col-header">TERMS & CONCEPTS</div>
+        <!-- Left tiles rendered here -->
+      </div>
+      <div class="column" id="defs-column">
+        <div class="col-header">DEFINITIONS</div>
+        <!-- Right tiles rendered here -->
+      </div>
+    </main>
+
+    <p class="footer-note">Select a term on the left and its matching definition on the right. Match all 8 pairs on each page to reconcile the ledger.</p>
+
+  </div>
+
+  <!-- Bottom Right Extra Fun Easter Egg -->
+  <div class="fun-container">
+    <div class="fun-toast" id="fun-toast">
+      🎶 Jackpot jingle unlocked! (The real song's copyrighted, so here's a vault remix instead) 🕺
+    </div>
+    <div class="fun-pointer" id="fun-pointer">
+      <span>psst…</span>
+      <svg width="24" height="16" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M 2 2 Q 12 14 20 6" stroke-dasharray="3 3"/>
+        <polyline points="14,6 20,6 20,12"/>
+      </svg>
+    </div>
+    <button class="btn-fun" id="btn-fun">🎉 Click here for extra fun</button>
+  </div>
+
+  <!-- Reconciled Receipt Modal -->
+  <div class="modal-overlay" id="modal-reconciled">
+    <div class="receipt-card">
+      <div class="receipt-header">
+        <div class="receipt-title">Ledger Page Reconciled</div>
+        <div class="receipt-sub">Vault Settlement Statement</div>
+      </div>
+      <div class="receipt-body">
+        <div class="receipt-row">
+          <span class="receipt-label">Completed Page:</span>
+          <span class="receipt-val" id="rec-page-num">1 of 6</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-label">Running Balance:</span>
+          <span class="receipt-val" id="rec-balance">$800</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-label">Total Terms Learned:</span>
+          <span class="receipt-val" id="rec-terms">8 / 48</span>
+        </div>
+      </div>
+      <button class="receipt-btn" id="btn-next-page">Next Page →</button>
+    </div>
+  </div>
+
+  <!-- Win Receipt Modal -->
+  <div class="modal-overlay" id="modal-win">
+    <div class="receipt-card">
+      <div class="receipt-header">
+        <div class="receipt-title">Master Ledger Audited</div>
+        <div class="receipt-sub">100% Glossary Completion</div>
+      </div>
+      <div class="receipt-body">
+        <div class="receipt-row">
+          <span class="receipt-label">Final Balance Earned:</span>
+          <span class="receipt-val" id="win-balance">$4,800</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-label">Audit Completion Time:</span>
+          <span class="receipt-val" id="win-time">00:00</span>
+        </div>
+        <div class="receipt-row">
+          <span class="receipt-label">Total Mastered Terms:</span>
+          <span class="receipt-val">48 / 48</span>
+        </div>
+      </div>
+      <button class="receipt-btn" id="btn-play-again">Play Again</button>
+    </div>
+  </div>
+
+  <!-- Win Fullscreen Overlay -->
+  <div class="win-overlay" id="win-overlay">
+    <h1 class="win-title">YOU WIN!</h1>
+  </div>
+
+  <script>
+    // --- 1. Glossay Data (48 Terms) ---
+    const DATA = [
+      { id: 0, term: "Bar chart", def: "A graph for a categorical variable with a bar per category, separated by gaps (unlike a histogram) since categories are distinct, not continuous.", hint: "Categorical data's chart — the bars don't touch." },
+      { id: 1, term: "Bimodal / Unimodal", def: "A distribution with two distinct peaks (bimodal) versus one single peak (unimodal).", hint: "Count the peaks in the histogram." },
+      { id: 2, term: "Bivariate", def: "Involving two variables at once, as opposed to univariate (one variable) measures like the mean or variance.", hint: "The prefix means \"two\" — two variables at once." },
+      { id: 3, term: "Box plot (boxplot)", def: "A chart showing the five-number summary of a numerical variable: minimum (non-outlier), Q1, median, Q3, maximum (non-outlier), with individual points beyond 1.5×IQR flagged as outliers.", hint: "Whiskers on both ends, a box holding the middle 50%." },
+      { id: 4, term: "Categorical variable", def: "A variable with a finite number of categories or groups, which may or may not have a logical order (e.g. payment method, credit rating).", hint: "Think groups, not numbers — e.g. payment method." },
+      { id: 5, term: "Causation", def: "A relationship where a change in one variable directly produces a change in another, established through controlled experiments rather than observed correlation alone.", hint: "Needs a controlled experiment, not just data moving together." },
+      { id: 6, term: "Coefficient of Variation (CV)", def: "Standard deviation expressed as a percentage of the mean (CV = σ/μ × 100); a unitless way to compare relative variability across datasets with different scales.", hint: "Standard deviation, rescaled as a percent of the mean." },
+      { id: 7, term: "Confounding", def: "A situation where an unseen third variable independently drives two other variables, making them appear related to each other when neither actually causes the other.", hint: "A hidden third factor is secretly driving both." },
+      { id: 8, term: "Contingency table", def: "A table crossing two categorical variables to show how often each combination of categories occurs.", hint: "Crosses two categorical variables into one grid." },
+      { id: 9, term: "Correlation", def: "A standardized measure (always between −1 and +1) of both the direction and strength of the linear relationship between two numerical variables; equal to covariance divided by the product of the two standard deviations.", hint: "Always lands somewhere between −1 and +1." },
+      { id: 10, term: "Correlation ≠ Causation", def: "The principle that two variables moving together (even with a very high correlation) does not by itself prove that one causes the other.", hint: "The golden rule — moving together isn't proof of a cause." },
+      { id: 11, term: "Covariance", def: "A measure of the direction (but not the strength) of the linear relationship between two numerical variables; positive means they move together, negative means they move oppositely, and it carries units, limiting comparison across datasets.", hint: "Only tells you direction — and it carries units." },
+      { id: 12, term: "Data", def: "Raw facts or values collected for analysis; described in the course as \"the world's most valuable resource.\"", hint: "Called \"the world's most valuable resource\" in class." },
+      { id: 13, term: "Descriptive statistics", def: "The branch of statistics that summarizes and describes the group the data was actually collected from, without generalizing beyond it.", hint: "Summarizes only the group you actually measured." },
+      { id: 14, term: "Empirical Rule", def: "For an approximately normal distribution: about 68% of values fall within 1 standard deviation of the mean, about 95% within 2, and about 99.7% within 3.", hint: "The 68 / 95 / 99.7 rule." },
+      { id: 15, term: "Frequency table", def: "A table listing each category (or bin) of a variable alongside how often it occurs in the data.", hint: "Lists each category right next to its count." },
+      { id: 16, term: "Histogram", def: "A chart of a numerical variable's distribution, using touching bars (bins) across a continuous number line, used to assess modality, tail behavior, and shape.", hint: "Touching bars laid across a number line." },
+      { id: 17, term: "Interquartile Range (IQR)", def: "The range of the middle 50% of a dataset, computed as Q3 − Q1; not affected by outliers.", hint: "Q3 minus Q1 — nothing more." },
+      { id: 18, term: "Interval data", def: "Numerical data with equally spaced, meaningful intervals but no true zero (e.g. temperature in °F) — means are valid, but ratios/percentages are not.", hint: "Equal gaps, but zero doesn't mean \"none\" — think °F." },
+      { id: 19, term: "Kurtosis", def: "A measure of how heavy or light a distribution's tails are compared to a normal distribution; leptokurtic = heavy tails (frequent extremes), platykurtic = thin tails (rare extremes), mesokurtic = normal tails (the baseline).", hint: "Are the tails heavy or light, compared to normal?" },
+      { id: 20, term: "Levels of measurement", def: "The four-tier classification of data — nominal, ordinal, interval, ratio — that determines which statistics and charts are mathematically valid for a given variable.", hint: "Nominal, ordinal, interval, ratio — in that order." },
+      { id: 21, term: "Mean", def: "The arithmetic average of all values in a dataset; uses every value but is sensitive to outliers and skew.", hint: "Add every value up, divide by how many there are." },
+      { id: 22, term: "Mean Absolute Deviation (MAD)", def: "The average of the absolute distances between each data point and the mean; occasionally used in forecasting as an error measure.", hint: "Average distance from the mean — no squaring involved." },
+      { id: 23, term: "Median", def: "The middle value of a dataset once sorted (or the average of the two middle values if n is even); robust to outliers and skew.", hint: "Sort the data, then find the one in the middle." },
+      { id: 24, term: "Mode", def: "The most frequently occurring value in a dataset; the only central-tendency measure valid for nominal data, and a dataset can have zero, one, or multiple modes.", hint: "Whichever value shows up most often." },
+      { id: 25, term: "Nominal data", def: "Categorical data with no logical order among categories (e.g. zip code, beverage type).", hint: "Categories with zero natural order." },
+      { id: 26, term: "Normal distribution", def: "A symmetric, bell-shaped distribution where the mean, median, and mode all coincide at the center.", hint: "The classic symmetric bell shape." },
+      { id: 27, term: "Numerical (quantitative) variable", def: "A variable that takes on a continuous range of numeric values (e.g. temperature, age, sales, payment amount).", hint: "Continuous values — age, sales, temperature." },
+      { id: 28, term: "Ordinal data", def: "Categorical data with a meaningful rank order but unequal, non-interpretable gaps between categories (e.g. small/medium/large, star ratings, credit ratings).", hint: "Ranked categories, but the gaps aren't equal — think star ratings." },
+      { id: 29, term: "Outlier", def: "An unusually extreme data point, generally identified in a box plot as lying beyond 1.5 × IQR from the box.", hint: "The point sitting way outside a box plot's whiskers." },
+      { id: 30, term: "Parameter", def: "A numerical characteristic of an entire population (usually unknown and estimated using a sample statistic).", hint: "The true number for the whole population — usually unknown." },
+      { id: 31, term: "Percentile", def: "The value below which a given percentage of the data falls (e.g. the 80th percentile exceeds 80% of the data).", hint: "The 80th one beats 80% of everybody else." },
+      { id: 32, term: "Pie chart", def: "A circular chart dividing a whole into slices representing each category's share of a categorical variable.", hint: "Slices of one whole circle." },
+      { id: 33, term: "Population", def: "The entire group a study or analysis ultimately wants to understand, as opposed to the smaller sample actually measured.", hint: "Every single one — the full group you actually care about." },
+      { id: 34, term: "Quartile", def: "One of three values (Q1, Q2/median, Q3) that divide a dataset into four equal parts.", hint: "One of three cut points splitting data into four parts." },
+      { id: 35, term: "Range", def: "The simplest measure of spread: the maximum value minus the minimum value; highly sensitive to outliers.", hint: "Just the max minus the min." },
+      { id: 36, term: "Ratio data", def: "Numerical data with equally spaced intervals AND a true, meaningful zero (e.g. revenue, height, units sold) — the only level where ratios and percentage change are valid.", hint: "Has a true zero — so ratios and percentages finally work." },
+      { id: 37, term: "Sample", def: "A subset of a population actually collected and measured, used to estimate characteristics of the full population.", hint: "The smaller group you actually measured." },
+      { id: 38, term: "Scatter plot", def: "A chart plotting paired values of two numerical variables as points, used to visually assess the direction, form, and strength of their relationship.", hint: "Dots for two numerical variables, one per axis." },
+      { id: 39, term: "Skewness", def: "A measure of the asymmetry of a distribution; positive (right) skew has a long right tail and mean > median, negative (left) skew has a long left tail and mean < median.", hint: "Which direction is the long tail pointing?" },
+      { id: 40, term: "Spurious correlation", def: "A statistically strong correlation between two variables that arises from chance or an unseen third factor rather than any real relationship between them.", hint: "Kentucky marriages and fishing-boat drownings, remember?" },
+      { id: 41, term: "Standard deviation", def: "The square root of the variance, expressing spread in the same units as the original data; the most commonly used and interpretable measure of dispersion.", hint: "Square root of variance — same units as your data." },
+      { id: 42, term: "Statistic", def: "A number computed directly from a sample (e.g. a sample mean), used to estimate an unknown population parameter.", hint: "Computed from the sample, not the population." },
+      { id: 43, term: "Statistics (the field)", def: "The tools and techniques for gathering, processing, interpreting, and presenting data, used to support decisions under uncertainty.", hint: "Collect, analyze, interpret, present." },
+      { id: 44, term: "Time series plot", def: "A line chart showing how a numerical variable changes over time, used to spot trends, seasonality, and changes in variability.", hint: "A line chart with time along the x-axis." },
+      { id: 45, term: "Variance", def: "The average of the squared deviations of each value from the mean; the basis for standard deviation, but expressed in squared (and thus less intuitive) units.", hint: "Average of the squared deviations from the mean." },
+      { id: 46, term: "Weighted mean", def: "An average in which some values contribute more than others according to assigned weights that sum to 1.", hint: "Not every value counts equally — some carry more weight." },
+      { id: 47, term: "Z-score", def: "The number of standard deviations a value lies above or below the mean (z = (x−μ)/σ); unitless, so it allows comparison across different distributions.", hint: "How many standard deviations from the mean?" }
+    ];
+
+    // --- 2. State Management ---
+    let masterOrder = [];
+    let currentPage = 1; // 1 to 6
+    let leftSlots = [];  // Array of term IDs on current page
+    let rightSlots = []; // Array of def IDs on current page
+    let matchedIds = new Set();
+    
+    let selectedLeftId = null;
+    let selectedRightId = null;
+    let activeHintId = null;
+    let inputLocked = false;
+
+    let balance = 0;
+    let termsLearned = 0;
+
+    let timerSeconds = 0;
+    let timerInterval = null;
+    let timerStarted = false;
+
+    // --- 3. Helper Functions ---
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60).toString().padStart(2, '0');
+      const s = (sec % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    function startTimer() {
+      if (timerStarted) return;
+      timerStarted = true;
+      timerInterval = setInterval(() => {
+        timerSeconds++;
+        document.getElementById('timer').textContent = formatTime(timerSeconds);
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+
+    // --- 4. Render Logic ---
+    function initGame() {
+      stopTimer();
+      timerSeconds = 0;
+      timerStarted = false;
+      document.getElementById('timer').textContent = "00:00";
+
+      balance = 0;
+      termsLearned = 0;
+      currentPage = 1;
+      matchedIds.clear();
+
+      document.getElementById('balance-display').textContent = `$${balance}`;
+      document.getElementById('terms-learned-num').textContent = termsLearned;
+
+      // Master shuffle
+      const ids = DATA.map(item => item.id);
+      masterOrder = shuffle(ids);
+
+      loadPage(currentPage);
+    }
+
+    function loadPage(pageNum) {
+      currentPage = pageNum;
+      selectedLeftId = null;
+      selectedRightId = null;
+      activeHintId = null;
+      inputLocked = false;
+
+      // Slice 8 IDs for current page
+      const pageIds = masterOrder.slice((pageNum - 1) * 8, pageNum * 8);
+      leftSlots = [...pageIds];
+      rightSlots = shuffle(pageIds);
+
+      updateStatusRow();
+      renderBoard();
+    }
+
+    function updateStatusRow() {
+      const pageMatchedCount = leftSlots.filter(id => matchedIds.has(id)).length;
+      document.getElementById('ledger-page-text').textContent = `Ledger Page ${currentPage} of 6 — ${pageMatchedCount}/8 matched`;
+      const fillPct = (pageMatchedCount / 8) * 100;
+      document.getElementById('page-progress-fill').style.width = `${fillPct}%`;
+      document.getElementById('terms-learned-num').textContent = matchedIds.size;
+    }
+
+    function renderBoard() {
+      const termsCol = document.getElementById('terms-column');
+      const defsCol = document.getElementById('defs-column');
+
+      // Keep column headers
+      termsCol.innerHTML = '<div class="col-header">TERMS & CONCEPTS</div>';
+      defsCol.innerHTML = '<div class="col-header">DEFINITIONS</div>';
+
+      // Left column (Terms)
+      leftSlots.forEach(id => {
+        const item = DATA.find(d => d.id === id);
+        const isMatched = matchedIds.has(id);
+        const isSelected = selectedLeftId === id;
+
+        const tile = document.createElement('div');
+        tile.className = `tile ${isMatched ? 'matched' : ''} ${isSelected ? 'selected' : ''}`;
+        tile.setAttribute('tabindex', isMatched ? '-1' : '0');
+        tile.setAttribute('role', 'button');
+        tile.dataset.id = id;
+        tile.dataset.side = 'left';
+
+        const textSpan = document.createElement('span');
+        textSpan.className = 'tile-text';
+        textSpan.textContent = item.term;
+        tile.appendChild(textSpan);
+
+        if (isMatched) {
+          const stamp = document.createElement('div');
+          stamp.className = 'matched-stamp';
+          stamp.textContent = 'MATCHED';
+          tile.appendChild(stamp);
+        } else {
+          // Hint button
+          const hintBtn = document.createElement('button');
+          hintBtn.className = 'hint-btn';
+          hintBtn.textContent = '?';
+          hintBtn.title = 'Show hint';
+          hintBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleHint(id, tile);
+          });
+          tile.appendChild(hintBtn);
+
+          // Render popover if active
+          if (activeHintId === id) {
+            const popover = document.createElement('div');
+            popover.className = 'hint-popover';
+            popover.textContent = item.hint;
+            tile.appendChild(popover);
+          }
+        }
+
+        tile.addEventListener('click', () => handleTileClick(id, 'left'));
+        tile.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleTileClick(id, 'left');
+          }
+        });
+
+        termsCol.appendChild(tile);
+      });
+
+      // Right column (Definitions)
+      rightSlots.forEach(id => {
+        const item = DATA.find(d => d.id === id);
+        const isMatched = matchedIds.has(id);
+        const isSelected = selectedRightId === id;
+
+        const tile = document.createElement('div');
+        tile.className = `tile ${isMatched ? 'matched' : ''} ${isSelected ? 'selected' : ''}`;
+        tile.setAttribute('tabindex', isMatched ? '-1' : '0');
+        tile.setAttribute('role', 'button');
+        tile.dataset.id = id;
+        tile.dataset.side = 'right';
+
+        const textSpan = document.createElement('span');
+        textSpan.className = 'tile-text';
+        textSpan.textContent = item.def;
+        tile.appendChild(textSpan);
+
+        if (isMatched) {
+          const stamp = document.createElement('div');
+          stamp.className = 'matched-stamp';
+          stamp.textContent = 'MATCHED';
+          tile.appendChild(stamp);
+        }
+
+        tile.addEventListener('click', () => handleTileClick(id, 'right'));
+        tile.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleTileClick(id, 'right');
+          }
+        });
+
+        defsCol.appendChild(tile);
+      });
+    }
+
+    function toggleHint(id, tileElem) {
+      if (matchedIds.has(id)) return;
+      if (activeHintId === id) {
+        activeHintId = null;
+      } else {
+        activeHintId = id;
+      }
+      renderBoard();
+    }
+
+    // --- 5. Selection & Matching Logic ---
+    function handleTileClick(id, side) {
+      if (inputLocked || matchedIds.has(id)) return;
+      startTimer();
+
+      // Close hint if user clicks a tile
+      activeHintId = null;
+
+      if (side === 'left') {
+        selectedLeftId = (selectedLeftId === id) ? null : id;
+      } else {
+        selectedRightId = (selectedRightId === id) ? null : id;
+      }
+
+      renderBoard();
+
+      // Check match if both selected
+      if (selectedLeftId !== null && selectedRightId !== null) {
+        checkMatch();
+      }
+    }
+
+    function checkMatch() {
+      inputLocked = true;
+
+      const leftTile = document.querySelector(`.tile[data-side="left"][data-id="${selectedLeftId}"]`);
+      const rightTile = document.querySelector(`.tile[data-side="right"][data-id="${selectedRightId}"]`);
+
+      if (selectedLeftId === selectedRightId) {
+        // Correct Match
+        leftTile.classList.add('good-flash');
+        rightTile.classList.add('good-flash');
+
+        // Float cash text near right tile
+        const rect = rightTile.getBoundingClientRect();
+        const cashElem = document.createElement('div');
+        cashElem.className = 'cash-float';
+        cashElem.textContent = '+$100';
+        cashElem.style.left = `${rect.left + rect.width / 2 - 20}px`;
+        cashElem.style.top = `${rect.top + window.scrollY - 10}px`;
+        document.body.appendChild(cashElem);
+        setTimeout(() => cashElem.remove(), 900);
+
+        setTimeout(() => {
+          matchedIds.add(selectedLeftId);
+          balance += 100;
+          document.getElementById('balance-display').textContent = `$${balance}`;
+
+          selectedLeftId = null;
+          selectedRightId = null;
+          inputLocked = false;
+
+          updateStatusRow();
+          renderBoard();
+
+          // Check Page Completion
+          const pageMatchedCount = leftSlots.filter(id => matchedIds.has(id)).length;
+          if (pageMatchedCount === 8) {
+            setTimeout(handlePageComplete, 350);
+          }
+        }, 500);
+
+      } else {
+        // Mismatch
+        leftTile.classList.add('bad-flash');
+        rightTile.classList.add('bad-flash');
+
+        setTimeout(() => {
+          selectedLeftId = null;
+          selectedRightId = null;
+          inputLocked = false;
+          renderBoard();
+        }, 500);
+      }
+    }
+
+    function handlePageComplete() {
+      if (matchedIds.size === 48) {
+        // Full Win
+        triggerWinCelebration();
+      } else {
+        // Page Reconciled Modal
+        document.getElementById('rec-page-num').textContent = `${currentPage} of 6`;
+        document.getElementById('rec-balance').textContent = `$${balance}`;
+        document.getElementById('rec-terms').textContent = `${matchedIds.size} / 48`;
+        document.getElementById('modal-reconciled').classList.add('active');
+      }
+    }
+
+    // --- 6. Randomize & Reset Controls ---
+    document.getElementById('btn-randomize').addEventListener('click', () => {
+      if (inputLocked) return;
+
+      // Unmatched right side items
+      const unmatchedRight = rightSlots.filter(id => !matchedIds.has(id));
+      const shuffledUnmatched = shuffle(unmatchedRight);
+
+      let shuffleIdx = 0;
+      rightSlots = rightSlots.map(id => {
+        if (matchedIds.has(id)) return id;
+        return shuffledUnmatched[shuffleIdx++];
+      });
+
+      selectedLeftId = null;
+      selectedRightId = null;
+      renderBoard();
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      stopFunJingle();
+      initGame();
+    });
+
+    document.getElementById('btn-next-page').addEventListener('click', () => {
+      document.getElementById('modal-reconciled').classList.remove('active');
+      loadPage(currentPage + 1);
+    });
+
+    document.getElementById('btn-play-again').addEventListener('click', () => {
+      document.getElementById('modal-win').classList.remove('active');
+      initGame();
+    });
+
+    // --- 7. Win Celebration ---
+    function triggerWinCelebration() {
+      stopTimer();
+      const winOverlay = document.getElementById('win-overlay');
+      winOverlay.classList.add('active');
+
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      
+      if (!prefersReducedMotion) {
+        // Rain money particles for 5 seconds
+        const emojis = ['💰', '💵', '🪙', '💲', '🤑'];
+        const particleInterval = setInterval(() => {
+          const p = document.createElement('div');
+          p.className = 'money-particle';
+          p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+          p.style.left = `${Math.random() * 95}vw`;
+          p.style.animationDuration = `${2.5 + Math.random() * 2}s`;
+          p.style.fontSize = `${1.5 + Math.random() * 1.2}rem`;
+          winOverlay.appendChild(p);
+
+          setTimeout(() => p.remove(), 4500);
+        }, 120);
+
+        setTimeout(() => {
+          clearInterval(particleInterval);
+          winOverlay.style.opacity = '0';
+          setTimeout(() => {
+            winOverlay.classList.remove('active');
+            winOverlay.style.opacity = '1';
+            showWinModal();
+          }, 1200);
+        }, 5000);
+      } else {
+        setTimeout(() => {
+          winOverlay.classList.remove('active');
+          showWinModal();
+        }, 1500);
+      }
+    }
+
+    function showWinModal() {
+      document.getElementById('win-balance').textContent = `$${balance}`;
+      document.getElementById('win-time').textContent = formatTime(timerSeconds);
+      document.getElementById('modal-win').classList.add('active');
+    }
+
+    // --- 8. Audio Synthesizer (Extra Fun Easter Egg) ---
+    let audioCtx = null;
+    let funPlaying = false;
+    let funTimeout = null;
+    let jingleInterval = null;
+
+    function startFunJingle() {
+      if (funPlaying) return;
+      funPlaying = true;
+
+      const btn = document.getElementById('btn-fun');
+      const toast = document.getElementById('fun-toast');
+      btn.textContent = '⏹ Stop the fun';
+      toast.style.display = 'block';
+
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      } catch (e) {
+        console.log('Web Audio API not supported');
+      }
+
+      // Notes arpeggio C4, E4, G4, C5, E5, G5
+      const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99];
+      let noteIdx = 0;
+
+      function playNote() {
+        if (!audioCtx || !funPlaying) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.value = notes[noteIdx % notes.length];
+        noteIdx++;
+
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.26);
+      }
+
+      jingleInterval = setInterval(playNote, 220);
+
+      // Auto stop after 30s
+      funTimeout = setTimeout(() => {
+        stopFunJingle();
+      }, 30000);
+    }
+
+    function stopFunJingle() {
+      funPlaying = false;
+      if (jingleInterval) clearInterval(jingleInterval);
+      if (funTimeout) clearTimeout(funTimeout);
+      if (audioCtx) {
+        audioCtx.close();
+        audioCtx = null;
+      }
+
+      const btn = document.getElementById('btn-fun');
+      const toast = document.getElementById('fun-toast');
+      btn.textContent = '🎉 Click here for extra fun';
+      toast.style.display = 'none';
+    }
+
+    document.getElementById('btn-fun').addEventListener('click', () => {
+      if (funPlaying) {
+        stopFunJingle();
+      } else {
+        startFunJingle();
+      }
+    });
+
+    // --- 9. Initial Launch ---
+    window.onload = () => {
+      initGame();
+    };
+  </script>
+</body>
+</html>
