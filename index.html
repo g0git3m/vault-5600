@@ -412,7 +412,7 @@
       position: absolute;
       bottom: calc(100% + 10px);
       right: 0;
-      width: 240px;
+      width: 250px;
       background: var(--bg-2);
       border: 1px solid var(--gold);
       color: var(--ink);
@@ -421,6 +421,7 @@
       border-radius: 8px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.6);
       display: none;
+      line-height: 1.3;
     }
 
     /* Modals */
@@ -587,6 +588,11 @@
 </head>
 <body>
 
+  <!-- Background Audio Player for Custom Track -->
+  <audio id="bg-audio" loop preload="auto">
+    <source src="Glitching Through The Sky By William Benckert.mp3" type="audio/mpeg">
+  </audio>
+
   <div class="app-container">
     
     <!-- Header -->
@@ -650,7 +656,7 @@
   <!-- Bottom Right Extra Fun Easter Egg -->
   <div class="fun-container">
     <div class="fun-toast" id="fun-toast">
-      🎶 Jackpot jingle unlocked! (The real song's copyrighted, so here's a vault remix instead) 🕺
+      🎵 Playing: "Glitching Through The Sky" by William Benckert 🎧
     </div>
     <div class="fun-pointer" id="fun-pointer">
       <span>psst…</span>
@@ -718,7 +724,7 @@
   </div>
 
   <script>
-    // --- 1. Glossay Data (48 Terms) ---
+    // --- 1. Glossary Data (48 Terms) ---
     const DATA = [
       { id: 0, term: "Bar chart", def: "A graph for a categorical variable with a bar per category, separated by gaps (unlike a histogram) since categories are distinct, not continuous.", hint: "Categorical data's chart — the bars don't touch." },
       { id: 1, term: "Bimodal / Unimodal", def: "A distribution with two distinct peaks (bimodal) versus one single peak (unimodal).", hint: "Count the peaks in the histogram." },
@@ -1053,10 +1059,11 @@
 
     function handlePageComplete() {
       if (matchedIds.size === 48) {
-        // Full Win
+        // Full Win (stops music on full completion)
+        stopMusic();
         triggerWinCelebration();
       } else {
-        // Page Reconciled Modal
+        // Page Reconciled Modal (Music keeps playing seamlessly here!)
         document.getElementById('rec-page-num').textContent = `${currentPage} of 6`;
         document.getElementById('rec-balance').textContent = `$${balance}`;
         document.getElementById('rec-terms').textContent = `${matchedIds.size} / 48`;
@@ -1084,13 +1091,13 @@
     });
 
     document.getElementById('btn-reset').addEventListener('click', () => {
-      stopFunJingle();
+      stopMusic(); // Reset button stops music
       initGame();
     });
 
     document.getElementById('btn-next-page').addEventListener('click', () => {
       document.getElementById('modal-reconciled').classList.remove('active');
-      loadPage(currentPage + 1);
+      loadPage(currentPage + 1); // Next page transition preserves music!
     });
 
     document.getElementById('btn-play-again').addEventListener('click', () => {
@@ -1144,67 +1151,33 @@
       document.getElementById('modal-win').classList.add('active');
     }
 
-    // --- 8. Audio Synthesizer (Extra Fun Easter Egg) ---
-    let audioCtx = null;
-    let funPlaying = false;
-    let funTimeout = null;
-    let jingleInterval = null;
+    // --- 8. MP3 Music Player Controls ---
+    const audioEl = document.getElementById('bg-audio');
+    let isMusicPlaying = false;
 
-    function startFunJingle() {
-      if (funPlaying) return;
-      funPlaying = true;
-
+    function toggleMusic() {
       const btn = document.getElementById('btn-fun');
       const toast = document.getElementById('fun-toast');
-      btn.textContent = '⏹ Stop the fun';
-      toast.style.display = 'block';
 
-      try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        audioCtx = new AudioContext();
-      } catch (e) {
-        console.log('Web Audio API not supported');
+      if (isMusicPlaying) {
+        stopMusic();
+      } else {
+        audioEl.play().then(() => {
+          isMusicPlaying = true;
+          btn.textContent = '⏹ Pause Music';
+          toast.style.display = 'block';
+        }).catch(err => {
+          console.warn('Playback blocked or failed:', err);
+          btn.textContent = '⚠️ Click again to retry audio';
+        });
       }
-
-      // Notes arpeggio C4, E4, G4, C5, E5, G5
-      const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99];
-      let noteIdx = 0;
-
-      function playNote() {
-        if (!audioCtx || !funPlaying) return;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-
-        osc.type = 'triangle';
-        osc.frequency.value = notes[noteIdx % notes.length];
-        noteIdx++;
-
-        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
-
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.26);
-      }
-
-      jingleInterval = setInterval(playNote, 220);
-
-      // Auto stop after 30s
-      funTimeout = setTimeout(() => {
-        stopFunJingle();
-      }, 30000);
     }
 
-    function stopFunJingle() {
-      funPlaying = false;
-      if (jingleInterval) clearInterval(jingleInterval);
-      if (funTimeout) clearTimeout(funTimeout);
-      if (audioCtx) {
-        audioCtx.close();
-        audioCtx = null;
-      }
+    function stopMusic() {
+      if (!audioEl) return;
+      audioEl.pause();
+      audioEl.currentTime = 0;
+      isMusicPlaying = false;
 
       const btn = document.getElementById('btn-fun');
       const toast = document.getElementById('fun-toast');
@@ -1212,13 +1185,7 @@
       toast.style.display = 'none';
     }
 
-    document.getElementById('btn-fun').addEventListener('click', () => {
-      if (funPlaying) {
-        stopFunJingle();
-      } else {
-        startFunJingle();
-      }
-    });
+    document.getElementById('btn-fun').addEventListener('click', toggleMusic);
 
     // --- 9. Initial Launch ---
     window.onload = () => {
