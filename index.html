@@ -52,7 +52,7 @@
       max-width: 1080px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 18px;
     }
 
     /* Tabular numbers */
@@ -188,6 +188,18 @@
       background: var(--gold);
       width: 0%;
       transition: width 0.3s ease;
+    }
+
+    /* Top Instruction Note */
+    .instruction-note {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+      background: var(--bg-2);
+      border: 1px solid var(--line);
+      padding: 8px 14px;
+      border-radius: 6px;
+      line-height: 1.4;
     }
 
     /* Board Layout */
@@ -358,14 +370,6 @@
     @keyframes floatUp {
       0% { opacity: 1; transform: translateY(0) scale(1); }
       100% { opacity: 0; transform: translateY(-35px) scale(1.1); }
-    }
-
-    /* Footer hint */
-    .footer-note {
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-top: 10px;
     }
 
     /* Fixed Bottom-Right Fun Button */
@@ -672,6 +676,9 @@
       </div>
     </div>
 
+    <!-- Top Instruction Note -->
+    <p class="instruction-note">Select a term on the left and its matching definition on the right. Match all 8 pairs on each page to reconcile the ledger.</p>
+
     <!-- Two Column Board -->
     <main class="board-grid" id="board-grid">
       <div class="column" id="terms-column">
@@ -683,8 +690,6 @@
         <!-- Right tiles rendered here -->
       </div>
     </main>
-
-    <p class="footer-note">Select a term on the left and its matching definition on the right. Match all 8 pairs on each page to reconcile the ledger.</p>
 
   </div>
 
